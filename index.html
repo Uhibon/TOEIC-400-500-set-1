@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TOEIC (400-500) set-1 – Boo-riculum</title>
+  <link rel="icon" type="image/png" href="booha-ghost.png">
+  <style>
+    :root { --ink:#222; --muted:#444; --accent:#0b78ff; --ok:#22c55e; --bad:#ef4444; }
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
+      color:var(--ink);
+      background:url('Booha card.jpg') center/cover fixed no-repeat;
+    }
+    .wrap{max-width:900px;margin:0 auto;padding:16px;}
+    header{
+      display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+      margin-bottom:12px;background:rgba(255,255,255,0.88);padding:12px 16px;
+      border-radius:16px;box-shadow:0 4px 10px rgba(0,0,0,0.15)
+    }
+    header h1{
+      font-size:18px;margin:0;font-weight:800;letter-spacing:.3px;
+      background:linear-gradient(90deg,#7dd3fc,#60a5fa,#a78bfa,#f472b6);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      display:flex;align-items:center;gap:8px
+    }
+    header h1 img{height:28px;width:auto;}
+    .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    select,button{
+      background:rgba(255,255,255,0.95);border:1px solid #ccc;
+      border-radius:12px;padding:10px 12px;font-size:14px;
+      box-shadow:0 2px 5px rgba(0,0,0,0.08)
+    }
+    button{cursor:pointer;}
+    .card{
+      user-select:none;-webkit-user-select:none;
+      display:flex;flex-direction:column;justify-content:center;align-items:center;
+      text-align:center;background:url('Booha card.jpg') center/cover no-repeat;
+      border:1px solid #ccc;border-radius:24px;min-height:56vh;margin:16px auto;padding:22px;
+      box-shadow:0 10px 40px rgba(0,0,0,.25); position:relative;
+    }
+    .brand{
+      position:absolute;top:10px;left:12px;display:flex;gap:8px;align-items:center;
+      background:rgba(255,255,255,0.85);padding:6px 10px;border-radius:12px;border:1px solid #ddd;
+      font-weight:800;letter-spacing:.2px;
+    }
+    .brand img{height:20px;width:auto}
+    .label{font-size:13px;margin-bottom:8px;background:rgba(255,255,255,0.7);padding:4px 8px;border-radius:8px}
+    .main{font-size:24px;font-weight:800;margin:8px 0 10px;background:rgba(255,255,255,0.86);padding:8px 12px;border-radius:12px}
+    .sub{font-size:18px;margin:0 0 6px;background:rgba(255,255,255,0.65);padding:4px 10px;border-radius:8px}
+    .hira{font-size:18px;color:var(--accent);background:rgba(255,255,255,0.75);padding:4px 10px;border-radius:8px}
+    .options{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+    .optbtn{border:1px solid #ccc;border-radius:12px;padding:10px 14px;background:rgba(255,255,255,0.95);cursor:pointer}
+    .optbtn.ok{background:#dcfce7;border-color:#86efac;color:#166534}
+    .optbtn.bad{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+    .footer{display:flex;justify-content:space-between;margin-top:8px;font-size:13px;background:rgba(255,255,255,0.85);padding:8px 12px;border-radius:12px}
+    .progress{height:8px;border-radius:999px;background:#eee;overflow:hidden}
+    .progress>span{display:block;height:100%;background:linear-gradient(90deg,#7dd3fc,#60a5fa,#a78bfa,#f472b6);width:0%}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1><img src="booha-ghost.png"> Boo-riculum – TOEIC (400-500) set-1</h1>
+      <div class="controls">
+        <select id="mode">
+          <option value="vocab-j2e">Vocab: 🇯🇵 → 🇺🇸</option>
+          <option value="vocab-e2j">Vocab: 🇺🇸 → 🇯🇵</option>
+          <option value="sentences">Sentences</option>
+          <option value="qa">Questions</option>
+          <option value="quiz">Quiz (MC)</option>
+          <option value="reading">Reading</option>
+        </select>
+      </div>
+    </header>
+
+    <div id="card" class="card">
+      <div class="brand"><img src="booha-ghost.png"><span>Boo-riculum</span></div>
+      <div id="label" class="label">Front</div>
+      <div id="main" class="main">—</div>
+      <div id="sub" class="sub">Tap / Space to flip</div>
+      <div id="hira" class="hira"></div>
+      <div id="mcArea" class="options"></div>
+    </div>
+
+    <div class="footer">
+      <div>
+        <button id="btnPrev">◀︎ Prev</button>
+        <button id="btnFlip">Flip</button>
+        <button id="btnNext">Next ▶︎</button>
+        <button id="btnShuffle">Shuffle</button>
+      </div>
+      <div style="min-width:180px;text-align:right">
+        <div id="counter">0 / 0</div>
+        <div class="progress"><span id="bar"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const VOCAB=[
+      {en:'station',ja:'駅',hira:'えき'},{en:'hotel',ja:'ホテル',hira:'ほてる'},
+      {en:'restaurant',ja:'レストラン',hira:'れすとらん'},{en:'store',ja:'店',hira:'みせ'},
+      {en:'bank',ja:'銀行',hira:'ぎんこう'},{en:'park',ja:'公園',hira:'こうえん'},
+      {en:'bus',ja:'バス',hira:'ばす'},{en:'train',ja:'電車',hira:'でんしゃ'},
+      {en:'street',ja:'通り',hira:'とおり'},{en:'ticket',ja:'切符',hira:'きっぷ'},
+      {en:'food',ja:'食べ物',hira:'たべもの'},{en:'money',ja:'お金',hira:'おかね'}
+    ];
+    const SENTENCES=[
+      {en:'I bought a ticket at the station.',ja:'私は駅で切符を買いました。',hira:'わたしは えきで きっぷを かいました。'},
+      {en:'She is waiting for the bus.',ja:'彼女はバスを待っています。',hira:'かのじょは ばすを まっています。'},
+      {en:'They arrived at the hotel late.',ja:'彼らはホテルに遅れて到着しました。',hira:'かれらは ほてるに おくれて とうちゃくしました。'},
+      {en:'We ordered food at the restaurant.',ja:'私たちはレストランで料理を注文しました。',hira:'わたしたちは れすとらんで りょうりを ちゅうもんしました。'},
+      {en:'The store will open at 10 a.m.',ja:'店は午前10時に開きます。',hira:'みせは ごぜん じゅうじに あきます。'}
+    ];
+    const QA=[
+      {q_en:'Where did you buy the ticket?',q_ja:'あなたはどこで切符を買いましたか？',q_hira:'あなたは どこで きっぷを かいましたか？',
+       a_en:'I bought it at the station.',a_ja:'駅で買いました。',a_hira:'えきで かいました。'},
+      {q_en:'Who is waiting for the bus?',q_ja:'バスを待っているのは誰ですか？',q_hira:'ばすを まっているのは だれですか？',
+       a_en:'She is waiting for the bus.',a_ja:'彼女がバスを待っています。',a_hira:'かのじょが ばすを まっています。'}
+    ];
+    const QUIZ=[
+      {cloze:'I ___ a ticket at the station.',answers:['bought'],ja:'私は駅で切符を買いました。',hira:'わたしは えきで きっぷを かいました。',full:'I bought a ticket at the station.'},
+      {cloze:'She is ___ for the bus.',answers:['waiting'],ja:'彼女はバスを待っています。',hira:'かのじょは ばすを まっています。',full:'She is waiting for the bus.'},
+      {cloze:'They ___ at the hotel late.',answers:['arrived'],ja:'彼らはホテルに遅れて到着しました。',hira:'かれらは ほてるに おくれて とうちゃくしました。',full:'They arrived at the hotel late.'},
+      {cloze:'We ___ food at the restaurant.',answers:['ordered'],ja:'私たちはレストランで料理を注文しました。',hira:'わたしたちは れすとらんで りょうりを ちゅうもんしました。',full:'We ordered food at the restaurant.'},
+      {cloze:'The store will ___ at 10 a.m.',answers:['open'],ja:'店は午前10時に開きます。',hira:'みせは ごぜん じゅうじに あきます。',full:'The store will open at 10 a.m.'}
+    ];
+    const READING=[
+      {en:'The train will leave at 7:30.',ja:'電車は7時30分に出発します。',hira:'でんしゃは しちじ さんじゅっぷんに しゅっぱつします。'},
+      {en:'Please show your ticket at the entrance.',ja:'入り口で切符を見せてください。',hira:'いりぐちで きっぷを みせてください。'},
+      {en:'The store will be closed on Sunday.',ja:'店は日曜日に休みです。',hira:'みせは にちようびに やすみです。'},
+      {en:'Welcome to City Hotel. Free breakfast is included.',ja:'シティホテルへようこそ。朝食は無料です。',hira:'してぃほてるへ ようこそ。ちょうしょくは むりょうです。'},
+      {en:'Big Sale! All shoes are 50% off this weekend.',ja:'大セール！今週末は靴が半額です。',hira:'だいせーる！こんしゅうまつは くつが はんがくです。'},
+      {en:'Notice: The library will close at 5 p.m. today.',ja:'お知らせ：図書館は今日午後5時に閉まります。',hira:'おしらせ：としょかんは きょう ごご ごじに しまります。'},
+      {en:'Email: Your flight has been delayed by one hour.',ja:'メール：あなたの飛行機は1時間遅れました。',hira:'めーる：あなたの ひこうきは いちじかん おくれました。'}
+    ];
+
+    let deck=[],index=0,showingFront=true;
+    const els={mode:document.getElementById('mode'),card:document.getElementById('card'),
+      label:document.getElementById('label'),main:document.getElementById('main'),sub:document.getElementById('sub'),
+      hira:document.getElementById('hira'),counter:document.getElementById('counter'),bar:document.getElementById('bar'),
+      btnPrev:document.getElementById('btnPrev'),btnNext:document.getElementById('btnNext'),btnFlip:document.getElementById('btnFlip'),
+      btnShuffle:document.getElementById('btnShuffle'),mcArea:document.getElementById('mcArea')};
+
+    function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr;}
+    function mcOptionsFor(item,n=4){const correct=item.answers[0];const pool=QUIZ.map(q=>q.answers[0]).filter(a=>a!==correct);shuffle(pool);return shuffle([correct,...pool.slice(0,n-1)])}
+    function buildDeck(){
+      const m=els.mode.value;
+      if(m==='vocab-j2e'||m==='vocab-e2j'){deck=VOCAB.map(x=>({type:'vocab',front:m==='vocab-j2e'?x.ja:x.en,back:m==='vocab-j2e'?x.en:x.ja,hira:x.hira}));}
+      else if(m==='sentences'){deck=SENTENCES.map(s=>({type:'sentence',front:s.ja,back:s.en+"\\n"+s.ja,hira:s.hira}));}
+      else if(m==='qa'){deck=QA.map(q=>({type:'qa',front:q.q_ja,back:q.a_en+"\\n"+q.a_ja,hira:q.q_hira+"\\n"+q.a_hira}));}
+      else if(m==='quiz'){deck=QUIZ.map(q=>({type:'quiz',front:q.cloze,back:q.full+"\\n"+q.ja,hira:q.hira,answers:q.answers,choices:mcOptionsFor(q)}));}
+      else if(m==='reading'){deck=READING.map(r=>({type:'reading',front:r.en,back:r.en+"\\n"+r.ja,hira:r.hira}));}
+      index=0;showingFront=true;render();
+    }
+    function render(){
+      if(deck.length===0){els.main.textContent='—';els.sub.textContent='No cards';return;}
+      const item=deck[index];els.label.textContent=showingFront?'Front':'Back';
+      const content=showingFront?item.front:item.back;
+      if(!showingFront&&content.includes('\\n')){const [en,ja]=content.split('\\n');els.main.innerHTML='<div>'+en+'</div><div>'+ja+'</div>';els.hira.textContent=item.hira;}
+      else{els.main.textContent=content;if(showingFront&&(item.type==='vocab'&&els.mode.value==='vocab-j2e'||item.type==='sentence'||item.type==='qa'))els.hira.textContent=item.hira;else els.hira.textContent='';}
+      if(item.type==='quiz'&&showingFront){els.mcArea.innerHTML='';item.choices.forEach(opt=>{const b=document.createElement('button');b.className='optbtn';b.textContent=opt;b.onclick=()=>{const correct=item.answers.includes(opt);if(correct)b.classList.add('ok');else b.classList.add('bad');item.choices.forEach(c=>{if(item.answers.includes(c)){[...els.mcArea.children].forEach(btn=>{if(btn.textContent===c)btn.classList.add('ok')})}});setTimeout(()=>{showingFront=false;render();},500);};els.mcArea.appendChild(b);});}else{els.mcArea.innerHTML='';}
+      els.counter.textContent=`${index+1} / ${deck.length}`;els.bar.style.width=((index+1)/deck.length*100)+'%';
+    }
+    function prev(){index=(index-1+deck.length)%deck.length;showingFront=true;render();}
+    function next(){index=(index+1)%deck.length;showingFront=true;render();}
+    function flip(){showingFront=!showingFront;render();}
+    function shuffleDeck(){deck=shuffle(deck);index=0;showingFront=true;render();}
+    els.mode.onchange=buildDeck;els.btnPrev.onclick=prev;els.btnNext.onclick=next;els.btnFlip.onclick=flip;els.btnShuffle.onclick=shuffleDeck;
+    buildDeck();
+  </script>
+</body>
+</html>
