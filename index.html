@@ -122,7 +122,6 @@
   <script>
     // ---------------- Data ----------------
     const VOCAB = [
-      // Places & common nouns/verbs (for vocab drills)
       { en:'station', ja:'駅', hira:'えき' },
       { en:'hotel', ja:'ホテル', hira:'ほてる' },
       { en:'restaurant', ja:'レストラン', hira:'れすとらん' },
@@ -274,7 +273,7 @@
         deck = SENTENCES.map(s=>({
           type:'sentence',
           front: s.ja,
-          back: s.en + '\\n' + s.ja,
+          back: s.en + '\n' + s.ja,
           hira: s.hira,
           sideLabelFront: 'Japanese sentence',
           sideLabelBack: 'Answer (EN + JA)',
@@ -283,8 +282,8 @@
         deck = QA.map(q=>({
           type:'qa',
           front: q.q_ja,
-          back: q.a_en + '\\n' + q.a_ja,
-          hira: q.q_hira + '\\n' + q.a_hira,
+          back: q.a_en + '\n' + q.a_ja,
+          hira: q.q_hira + '\n' + q.a_hira,
           sideLabelFront: 'Question (JA)',
           sideLabelBack: 'Answer (EN + JA)',
         }));
@@ -294,7 +293,7 @@
           return {
             type:'quiz',
             front: q.cloze,
-            back: q.full + '\\n' + q.ja,
+            back: q.full + '\n' + q.ja,
             hira: q.hira,
             answers: q.answers,
             choices,
@@ -306,7 +305,7 @@
         deck = READING.map(r=>({
           type:'reading',
           front: r.en,
-          back: r.en + '\\n' + r.ja,
+          back: r.en + '\n' + r.ja,
           hira: r.hira,
           sideLabelFront: 'Reading (EN)',
           sideLabelBack: 'Reading (EN + JA)',
@@ -324,14 +323,14 @@
       const content = showingFront ? item.front : item.back;
 
       // Main content & JA + hira logic
-      if((!showingFront) && (item.type==='qa' || item.type==='quiz' || item.type==='sentence' || item.type==='reading') && content.includes('\\n')){
-        const [line1, line2] = content.split('\\n'); // EN, JA
+      if((!showingFront) && (item.type==='qa' || item.type==='quiz' || item.type==='sentence' || item.type==='reading') && content.includes('\n')){
+        const [line1, line2] = content.split('\n'); // EN, JA
         els.main.innerHTML = `<div style="font-size:22px;font-weight:700" class="${item.type==='reading'?'small':''}">${line1}</div>
                               <div class="sub ${item.type==='reading'?'small':''}" style="margin-top:8px">${line2}</div>`;
         if(item.hira){
           els.hira.classList.remove('hidden');
           if(item.type==='qa'){
-            const parts = item.hira.split('\\n');
+            const parts = item.hira.split('\n');
             const hiraToShow = showingFront ? parts[0] : (parts[1] || '');
             els.hira.textContent = hiraToShow;
           } else {
@@ -343,8 +342,8 @@
         if(showingFront && (item.type==='vocab' && els.mode.value==='vocab-j2e' || item.type==='sentence' || item.type==='qa')){
           if(item.hira){
             els.hira.classList.remove('hidden');
-            if(item.type==='qa' && item.hira.includes('\\n')){
-              els.hira.textContent = item.hira.split('\\n')[0];
+            if(item.type==='qa' && item.hira.includes('\n')){
+              els.hira.textContent = item.hira.split('\n')[0];
             } else {
               els.hira.textContent = item.hira;
             }
@@ -368,12 +367,15 @@
             e.preventDefault(); e.stopPropagation();
             const norm = (s)=>s.toLowerCase().trim();
             const isCorrect = item.answers.map(a=>norm(a)).includes(norm(opt));
-            const allBtns = [...els.mcArea.querySelectorAll('button')];
-            allBtns.forEach(b=>b.disabled=true);
-            if(isCorrect){ btn.classList.add('ok'); } else { btn.classList.add('bad'); }
-            const correctBtn = allBtns.find(b => item.answers.map(a=>norm(a)).includes(norm(b.textContent)));
-            if(correctBtn) correctBtn.classList.add('ok');
-            setTimeout(()=>{ showingFront = false; render(); }, 350);
+            if(isCorrect){
+              btn.classList.add('ok');
+              const allBtns = [...els.mcArea.querySelectorAll('button')];
+              allBtns.forEach(b=>b.disabled=true);
+              setTimeout(()=>{ showingFront = false; render(); }, 350);
+            } else {
+              btn.classList.add('bad');
+              btn.disabled = true;
+            }
           }, { passive:false });
           els.mcArea.appendChild(btn);
         });
